@@ -5,7 +5,6 @@ import React, {
   useRef,
   useState
 } from "react";
-import MovieTile from "../component/movie";
 import "./movie-container.css";
 
 export default function MovieContainer({ movies }) {
@@ -26,105 +25,7 @@ export default function MovieContainer({ movies }) {
     animationInProgress: false
   });
 
-  const shiftTilesLeft = useCallback(() => shiftTiles(1), [
-    containerState.containerWidth,
-    containerState.activeIndex
-  ]);
-  const shiftTilesRight = useCallback(() => shiftTiles(-1), [
-    containerState.containerWidth,
-    containerState.activeIndex
-  ]);
-
-  useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useLayoutEffect(() => {
-    if (containerState.activeIndex === 0) {
-      sliderRef.current.style.transform = `translateX(0%)`;
-      return;
-    }
-
-    sliderRef.current.style.transform = `translateX(-${(containerState.initialTranslation
-      ? 0
-      : containerState.translationPerc) +
-      100 * containerState.direction * -1}%)`;
-  }, [sliderRef, containerState.activeIndex, containerState.length]);
-
-  useEffect(() => {
-    if (
-      containerState.activeIndex !== 0 &&
-      !containerState.animationInProgress
-    ) {
-      sliderRef.current.style.transform = `translateX(-${
-        containerState.translationPerc
-      }%)
-      `;
-    }
-  }, [containerState.animationInProgress, containerState.translationPerc]);
-
-  const toggleAnimation = useCallback(() => {
-    sliderRef.current.classList.remove("animating");
-    setContainerState(prevState => ({
-      ...prevState,
-      animationInProgress: false,
-      activeMovies: getActiveMovies(prevState)
-    }));
-  }, [sliderRef]);
-
-  const handleResize = () => {
-    containerSizeChanged(
-      (containerRef.current as HTMLElement).getBoundingClientRect().width
-    );
-  };
-
-  const shiftTiles = direction => {
-    sliderRef.current.classList.add("animating");
-
-    setContainerState(prevState => ({
-      ...prevState,
-      activeIndex: prevState.activeIndex + prevState.length * direction * -1,
-      direction,
-      initialTranslation: prevState.activeIndex === 0,
-      animationInProgress: true
-    }));
-  };
-
-  const containerSizeChanged = useCallback(
-    width => {
-      width += margin * 2;
-      let num = 0;
-      if (width < 500) {
-        num = 2;
-      } else if (width >= 500 && width < 800) {
-        num = 3;
-      } else if (width >= 800 && width < 1100) {
-        num = 4;
-      } else if (width >= 1100 && width < 1400) {
-        num = 5;
-      } else {
-        num = 6;
-      }
-
-      setContainerState(prevState => {
-        const newState = {
-          ...prevState,
-          length: num,
-          containerWidth: width,
-          translationPerc: getTranslatedPerc(num)
-        };
-
-        return { ...newState, activeMovies: getActiveMovies(newState) };
-      });
-    },
-    [containerState.containerWidth]
-  );
-
-  const getActiveMovies = state => {
+  const getActiveMovies = (state) => {
     const { length: tilesToShow, activeIndex: activeTileIndex } = state;
 
     const left = [];
@@ -153,7 +54,101 @@ export default function MovieContainer({ movies }) {
     return [...left, ...mid, ...right];
   };
 
-  const getTranslatedPerc = tilesCount => 100 + 100 / tilesCount;
+  const getTranslatedPerc = (tilesCount) => 100 + 100 / tilesCount;
+
+  const shiftTiles = (direction) => {
+    sliderRef.current.classList.add("animating");
+
+    setContainerState((prevState) => ({
+      ...prevState,
+      activeIndex: prevState.activeIndex + prevState.length * direction * -1,
+      direction,
+      initialTranslation: prevState.activeIndex === 0,
+      animationInProgress: true
+    }));
+  };
+
+  const containerSizeChanged = useCallback(
+    (width) => {
+      width += margin * 2;
+      let num = 0;
+      if (width < 500) {
+        num = 2;
+      } else if (width >= 500 && width < 800) {
+        num = 3;
+      } else if (width >= 800 && width < 1100) {
+        num = 4;
+      } else if (width >= 1100 && width < 1400) {
+        num = 5;
+      } else {
+        num = 6;
+      }
+
+      setContainerState((prevState) => {
+        const newState = {
+          ...prevState,
+          length: num,
+          containerWidth: width,
+          translationPerc: getTranslatedPerc(num)
+        };
+
+        return { ...newState, activeMovies: getActiveMovies(newState) };
+      });
+    },
+    [containerState.containerWidth]
+  );
+
+  const shiftTilesLeft = useCallback(() => shiftTiles(1), []);
+  const shiftTilesRight = useCallback(() => shiftTiles(-1), []);
+
+  const handleResize = () => {
+    containerSizeChanged(
+      (containerRef.current as HTMLElement).getBoundingClientRect().width
+    );
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (containerState.activeIndex === 0) {
+      sliderRef.current.style.transform = `translateX(0%)`;
+      return;
+    }
+
+    sliderRef.current.style.transform = `translateX(-${
+      (containerState.initialTranslation ? 0 : containerState.translationPerc) +
+      100 * containerState.direction * -1
+    }%)`;
+  }, [sliderRef, containerState.activeIndex, containerState.length]);
+
+  useEffect(() => {
+    if (
+      containerState.activeIndex !== 0 &&
+      !containerState.animationInProgress
+    ) {
+      sliderRef.current.style.transform = `translateX(-${containerState.translationPerc}%)
+      `;
+    }
+  }, [
+    containerState.animationInProgress,
+    containerState.activeIndex,
+    containerState.translationPerc
+  ]);
+
+  const toggleAnimation = useCallback(() => {
+    sliderRef.current.classList.remove("animating");
+    setContainerState((prevState) => ({
+      ...prevState,
+      animationInProgress: false,
+      activeMovies: getActiveMovies(prevState)
+    }));
+  }, [sliderRef]);
 
   const prevButton =
     containerState.activeIndex !== 0 ? (
