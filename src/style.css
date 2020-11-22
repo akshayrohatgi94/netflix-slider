@@ -1,0 +1,17 @@
+h1,
+p {
+  font-family: Lato;
+}
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #333;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
